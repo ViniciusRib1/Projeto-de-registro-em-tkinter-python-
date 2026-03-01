@@ -1,93 +1,114 @@
 import tkinter as tk
 from tkinter import messagebox
 
-usuários = {
-    "Nome": "",
-    "Email": "",
-    "senha": ""
-}
+ARQUIVO = "usuarios.txt"
 
-def entrar_registro():
-    print("Bom dia")
+def salvar_usuario(nome, email, senha):
+    with open(ARQUIVO, "a") as f:
+        f.write(f"{nome};{email};{senha}\n")
+
+def verificar_login(nome, senha):
+    try:
+        with open(ARQUIVO, "r") as f:
+            for linha in f:
+                dados = linha.strip().split(";")
+                if dados[0] == nome and dados[2] == senha:
+                    return dados
+    except FileNotFoundError:
+        return None
+    return None
+
+def tela_principal(dados_usuario):
+    tela = tk.Tk()
+    tela.title("Tela Principal")
+    tela.geometry("400x300")
+
+    tk.Label(tela, text="Bem-vindo!", font=("Arial", 14, "bold")).pack(pady=10)
+    tk.Label(tela, text=f"Nome: {dados_usuario[0]}").pack()
+    tk.Label(tela, text=f"Email: {dados_usuario[1]}").pack()
+    tk.Label(tela, text=f"Senha: {dados_usuario[2]}").pack()
+
+    tk.Button(tela, text="Sair", command=tela.destroy).pack(pady=20)
+
+    tela.mainloop()
 
 def login():
-    login = tk.Tk()
-    login.title("Logar")
-    login.geometry("400x400")
+    login_janela = tk.Tk()
+    login_janela.title("Login")
+    login_janela.geometry("400x300")
 
-    tituloLogin_label = tk.Label(login, text="Logar-se", font=("arial", 14, "bold"))
-    tituloLogin_label.pack(padx=10,pady=10)
+    tk.Label(login_janela, text="Login", font=("Arial", 14, "bold")).pack(pady=10)
 
-    usuario_label = tk.Label(login, text="Coloque o nome do usuário:")
-    usuario_label.place(x=10,y=50)
+    tk.Label(login_janela, text="Usuário:").pack()
+    usuario_entry = tk.Entry(login_janela)
+    usuario_entry.pack()
 
-    senhaLogin_label = tk.Label(login, text="Coloque sua senha:")
-    senhaLogin_label.place(x=10,y=120)
+    tk.Label(login_janela, text="Senha:").pack()
+    senha_entry = tk.Entry(login_janela, show="*")
+    senha_entry.pack()
 
-    usuarioLogin_entry = tk.Entry(login, width=60)
-    usuarioLogin_entry.place(x=10, y=90)
+    def entrar():
+        nome = usuario_entry.get()
+        senha = senha_entry.get()
+        dados = verificar_login(nome, senha)
 
-    senhaLogin_entry = tk.Entry(login, width=60)
-    senhaLogin_entry.place(x=10, y=160)
+        if dados:
+            messagebox.showinfo("Sucesso", "Login realizado!")
+            login_janela.destroy()
+            tela_principal(dados)
+        else:
+            messagebox.showerror("Erro", "Usuário ou senha incorretos")
 
-    entrarLogin = tk.Button(login, text="Entrar", width=50)
-    entrarLogin.place(x=10,y=200)
+    tk.Button(login_janela, text="Entrar", command=entrar).pack(pady=10)
 
-    login.mainloop()
+    login_janela.mainloop()
 
 def registrar():
-    registrar = tk.Tk()
-    registrar.title("Registrar-se")
-    registrar.geometry("400x400")
-    
-    tituloRegistro = tk.Label(registrar, text="Registrar-se", font=("arial", 14, "bold"))
-    tituloRegistro.pack(padx=10,pady=10)
+    reg_janela = tk.Tk()
+    reg_janela.title("Registrar")
+    reg_janela.geometry("400x350")
 
-    gmail_label = tk.Label(registrar, text="Coloque o seu gmail:")
-    gmail_label.place(x=10,y=60)
+    tk.Label(reg_janela, text="Registrar", font=("Arial", 14, "bold")).pack(pady=10)
 
-    usuario_label = tk.Label(registrar, text="Coloque o nome do usuário:")
-    usuario_label.place(x=10,y=120)
+    tk.Label(reg_janela, text="Email:").pack()
+    email_entry = tk.Entry(reg_janela)
+    email_entry.pack()
 
-    senhaRegistro_label = tk.Label(registrar, text="Coloque sua senha:")
-    senhaRegistro_label.place(x=10,y=190)
+    tk.Label(reg_janela, text="Usuário:").pack()
+    usuario_entry = tk.Entry(reg_janela)
+    usuario_entry.pack()
 
-    usuarioRegistro_entry = tk.Entry(registrar, width=60)
-    usuarioRegistro_entry.place(x=10, y=90)
+    tk.Label(reg_janela, text="Senha:").pack()
+    senha_entry = tk.Entry(reg_janela, show="*")
+    senha_entry.pack()
 
-    senhaRegistro_entry = tk.Entry(registrar, width=60)
-    senhaRegistro_entry.place(x=10, y=210)
+    def cadastrar():
+        nome = usuario_entry.get()
+        email = email_entry.get()
+        senha = senha_entry.get()
 
-    gmailRegistro_entry = tk.Entry(registrar, width=60)
-    gmailRegistro_entry.place(x=10, y=140)
+        if nome and email and senha:
+            salvar_usuario(nome, email, senha)
+            messagebox.showinfo("Sucesso", "Usuário cadastrado!")
+            reg_janela.destroy()
+        else:
+            messagebox.showerror("Erro", "Preencha todos os campos")
 
-    
+    tk.Button(reg_janela, text="Cadastrar", command=cadastrar).pack(pady=15)
 
-    entrarRegistro = tk.Button(registrar, text="Entrar", width=50, command=lambda:entrar_registro())
-    entrarRegistro.place(x=10,y=350)
-
-
-    registrar.mainloop()
+    reg_janela.mainloop()
 
 def main():
     janela = tk.Tk()
-    janela.title("Login de usuários em txt")
-    janela.geometry("800x400")
+    janela.title("Sistema de Login TXT")
+    janela.geometry("400x200")
 
-    titulo = tk.Label(text="Modelo de registro em txt", font=("arial", 14, "bold"))
-    titulo.pack(padx=10,pady=10)
+    tk.Label(janela, text="Sistema de Login", font=("Arial", 14, "bold")).pack(pady=20)
 
-    login_label = tk.Label(text="Logar usuário")
-    login_label.place(x=80,y=100)
-
-    registrar_label = tk.Label(text="Registrar")
-    registrar_label.place(x=650,y=100)
-
-    login_button = tk.Button(text="login", width=20, command=login)
-    login_button.place(x=50,y=140)
-
-    registrar_button = tk.Button(text="Registrar", width=20, command=registrar)
-    registrar_button.place(x=600,y=140)
+    tk.Button(janela, text="Login", width=20, command=login).pack(pady=5)
+    tk.Button(janela, text="Registrar", width=20, command=registrar).pack(pady=5)
 
     janela.mainloop()
-main()
+
+if __name__ == "__main__":
+    main()
